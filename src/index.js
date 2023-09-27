@@ -4,7 +4,7 @@ import "./index.css";
 import "./assets/css/styles.css";
 import "./assets/css/bouncing.css";
 import App from "./App";
-import "./assets/fontawesome-free-6.4.0-web/css/all.min.css";
+//import "./assets/fontawesome-free-6.4.0-web/css/all.min.css";
 import { store } from "./store";
 import { Provider } from "react-redux"; 
 import "react-toastify/dist/ReactToastify.css";

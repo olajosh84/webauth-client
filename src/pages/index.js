@@ -1,0 +1,14 @@
+export { default as Home } from "./Home";
+export { default as About } from "./About";
+export { default as Contact } from "./Contact";
+export { default as Blog } from "./Blog";
+export { default as Account } from "./Account";
+export { default as SignUp } from "./SignUp";
+export { default as Login } from "./Login";
+export { default as ResetPassword } from "./ResetPassword";
+export { default as SinglePost } from "./SinglePost";
+export { default as Logout } from "./Logout";
+export {default as Profile } from "./Profile";
+export { default as Settings } from "./Settings"; 
+export {default as Notifications } from "./Notifications";
+export { default as Messages } from "./Messages"; 

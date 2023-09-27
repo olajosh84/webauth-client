@@ -1,0 +1,118 @@
+.animateSlide{
+    animation: fadeInSlide 1s ease-in-out;
+}
+.animateSlideCaption {
+    animation: slideInCaption 1s ease;
+}
+.animateTagLine {
+    animation: slideInTagLine 1s linear;
+}
+.animateSlideBtn {
+    animation: slideInButton 1s linear;
+}
+.animateAlert {
+    animation: slideInAlert 0.4s linear;
+}
+.animateSidebar {
+    animation: slideInSidebar 0.4s ease-in;
+}
+.animateAvatars {
+    animation: slideInAvatars 0.4s ease;
+}
+.animateUserSearch { 
+    animation: slideInUserSearch 0.4s ease-in-out;
+}
+.animateSearch { 
+    animation: slideInSearch 0.4s ease-in-out;
+}
+.active{
+    color: blue;
+    font-weight: bold;
+    border-bottom: 2px solid skyblue;
+}
+/** faq group class*/
+.show-answer .faq-plus-icon{
+    display: none;
+}
+.show-answer .faq-minus-icon{
+    display: inline-flex;
+}
+
+@keyframes fadeInSlide {
+    from {
+        opacity: 0;
+    }
+    to{
+        opacity: 1;
+    }
+}
+
+@keyframes slideInCaption {
+    0%{
+        transform: translateY(-300%);
+    }
+    100%{
+        transform: translateY(0%);
+    }
+}
+
+@keyframes slideInTagLine {
+    0%{
+        transform: translateX(-100%) ;
+    }
+    100%{
+        transform: translateX(0%);
+    }
+}
+
+@keyframes slideInButton {
+    from{
+        transform: translateX(500%);
+    }
+    to{
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInAlert {
+    from {
+        transform: translateY(-100%);
+    }
+    to{
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInSidebar {
+    0%{
+        top: 2rem;
+    }
+    100%{
+        top: 0;
+    }
+}
+
+@keyframes slideInAvatars {
+    from {
+        top: -100%;
+    }
+    to {
+        top: 0;
+    }
+}
+@keyframes slideInUserSearch {
+    from {
+        right: -100%;
+    }
+    to {
+        right: 0;
+    }
+}
+@keyframes slideInSearch {
+    0%{
+        top: 7rem;
+    }
+    100%{
+        top: 5rem;
+    }
+}

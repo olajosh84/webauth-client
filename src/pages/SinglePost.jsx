@@ -11,7 +11,7 @@ const SinglePost = () => {
    
     return (
         <section className="section-basics text-gray-700 max-w-[1000px]">
-            <article className="bg-white shadow-xl block">
+            <article className="bg-white dark:bg-gray-950 dark:text-gray-200 shadow-xl block">
                 <img src={require(`../assets/images/${img}`)} alt="" className="w-full h-[250px] object-cover md:h-[500px]" />
                 <h1 className="text-2xl capitalize px-4 pt-2">{title}</h1>
                 <div className="flex gap-2 px-4">

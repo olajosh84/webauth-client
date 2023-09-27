@@ -9,28 +9,20 @@ import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Loader } from "../components";
 import handleSHowHidePassword from "../assets/js/showHidePassword";
-import { useCookies } from "react-cookie";
 
 const Login = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const { session, cookieExpiry } = useSelector((store) => store.userData);
+    const { session } = useSelector((store) => store.userData);
     const [login, {isLoading}] = useLoginMutation();
     const [authenticateUser] = useAuthenticateUserMutation();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const [cookies, setCookie] = useCookies();
     
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
             const data = await login({username, password}).unwrap();
-            /**update cookies */
-            setCookie('token', data.token, {
-                secure: process.env.REACT_APP_ENV === "production",
-                sameSite: "strict",
-                expires: cookieExpiry
-            })
             const data2 = await authenticateUser().unwrap();
             /**save user info in cookies */
             if(data2){
@@ -45,11 +37,6 @@ const Login = () => {
             navigate("/account");
         } catch (error) {
             if(error?.data?.message === "You have yet to confirm your email"){
-                setCookie('token', error?.data?.token, {
-                    secure: process.env.REACT_APP_ENV === "production",
-                    sameSite: "strict",
-                    expires: cookieExpiry
-                })
                 /**before navigating to sign up page, first update local storage/session 
                  * with new user info and then ensure the otp form is open */
                 /**get session saved in cookies and update state */

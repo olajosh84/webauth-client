@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useCookies } from "react-cookie";
 import { Link, useNavigate } from "react-router-dom";
 import { useRegisterMutation, useVerifyOtpMutation, useSendMailMutation, 
     useConfirmUserMutation, useAuthenticateUserMutation } from "../features/apis/authApiSlice";
@@ -15,7 +14,7 @@ let timeLeft = 60 * 5;
 
 export default function SignUp () {
     const {showAlert} = useSelector(store => store.mailAlert);
-    const { session, cookieExpiry } = useSelector(store => store.userData);
+    const { session } = useSelector(store => store.userData);
     const { loading, showOTPForm} = useSelector((store) => store.otpInfo);
     const [time, setTime] = useState(0);
     const [otp, setOtp] = useState("");
@@ -28,7 +27,6 @@ export default function SignUp () {
     const [authenticateUser] = useAuthenticateUserMutation(); 
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const [cookies, setCookie] = useCookies([]);
    
     /**run on every change in input */
     const handleInputChange = (e) => {
@@ -45,12 +43,6 @@ export default function SignUp () {
         e.preventDefault();
         try {
             const data = await register(formData).unwrap();
-            /**save token in cookie */
-            setCookie('token', data.token, {
-                secure: process.env.REACT_APP_ENV === "production",
-                sameSite: "strict",
-                expires: cookieExpiry
-            })
             /**get session saved in cookies and update state */
             const data2 = await authenticateUser().unwrap();
             if(data2){
@@ -94,13 +86,7 @@ export default function SignUp () {
         try {
             /**verify otp and confirm user */
             const data = await verifyOtp({userEmail, otp}).unwrap();
-            const verify = await confirmUser({userEmail}).unwrap();
-            /**update cookies with theuser's new info */
-            setCookie('token', verify.token, {
-                secure: process.env.REACT_APP_ENV === "production",
-                sameSite: "strict",
-                expires: cookieExpiry
-            })
+            await confirmUser({userEmail}).unwrap();
             /**get session saved in cookies and update state */
             const data2 = await authenticateUser().unwrap();
             if(data2){

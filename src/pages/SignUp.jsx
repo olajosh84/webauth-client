@@ -48,7 +48,7 @@ export default function SignUp () {
             /**save token in cookie */
             setCookie('token', data.token, {
                 secure: process.env.REACT_APP_ENV === "production",
-                sameSite: "strict",
+                //sameSite: "strict",
                 expires: cookieExpiry
             })
             /**get session saved in cookies and update state */
@@ -98,7 +98,7 @@ export default function SignUp () {
             /**update cookies with theuser's new info */
             setCookie('token', verify.token, {
                 secure: process.env.REACT_APP_ENV === "production",
-                sameSite: "strict",
+                //sameSite: "strict",
                 expires: cookieExpiry
             })
             /**get session saved in cookies and update state */

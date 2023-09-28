@@ -4,16 +4,19 @@ import { handleShowAvatars } from "../features/users/accountSlice";
 import { useState } from "react";
 import { useUpdateProfileMutation } from "../features/apis/userApiSlice";
 import { createSession } from "../features/users/userDataSlice";
+import { useAuthenticateUserMutation } from "../features/apis/authApiSlice";
 import { toast } from "react-toastify";
-
+import { useCookies } from "react-cookie";
 
 export default function Profile () {
-    const { session } = useSelector(store => store.userData);
+    const { session, cookieExpiry } = useSelector(store => store.userData);
     const { showAvatars, selectedAvatar } = useSelector(store => store.accountInfo);
     const [ firstName, setFirstName ] = useState(session?.firstName || "");
     const [ lastName, setLastName ] = useState(session?.lastName || "");
     const [ updateProfile, { isLoading } ] = useUpdateProfileMutation();
+    const [ authenticateUser ] = useAuthenticateUserMutation(); 
     const dispatch = useDispatch();
+    const [cookies, setCookie] = useCookies();
 
     /**handle sent avatar */
     let sentAvatar;
@@ -38,8 +41,15 @@ export default function Profile () {
         try {
             const data = await updateProfile({userId: session?.userId, firstName, lastName, sentAvatar }).unwrap();
             //update user cookies
-            localStorage.setItem('session', JSON.stringify(data.userInfo));
-            dispatch(createSession({...data.userInfo}));
+            setCookie('token', data.token, {
+                secure: process.env.REACT_APP_ENV === "production",
+                sameSite: "strict",
+                expires: cookieExpiry
+            })
+            const data2 = await authenticateUser().unwrap();
+            if(data2){
+                dispatch(createSession({...data2.sessionInfo}));
+            }
             toast.success(data.message);
         } catch (error) {
             toast.error(error?.data?.message || "Something went wrong");
@@ -72,5 +82,6 @@ export default function Profile () {
             </form>
             {showAvatars && <Avatars />}
         </div>
+        
     )
 }

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
+import { useCookies } from "react-cookie";
 import { Link, useNavigate } from "react-router-dom";
 import { useRegisterMutation, useVerifyOtpMutation, useSendMailMutation, 
-    useConfirmUserMutation } from "../features/apis/authApiSlice";
+    useConfirmUserMutation, useAuthenticateUserMutation } from "../features/apis/authApiSlice";
 import { createSession } from "../features/users/userDataSlice";
 import { toast } from "react-toastify";
 import { Loader, MailAlert } from "../components";
@@ -14,7 +15,7 @@ let timeLeft = 60 * 5;
 
 export default function SignUp () {
     const {showAlert} = useSelector(store => store.mailAlert);
-    const { session } = useSelector(store => store.userData);
+    const { session, cookieExpiry } = useSelector(store => store.userData);
     const { loading, showOTPForm} = useSelector((store) => store.otpInfo);
     const [time, setTime] = useState(0);
     const [otp, setOtp] = useState("");
@@ -24,9 +25,10 @@ export default function SignUp () {
     const [verifyOtp] = useVerifyOtpMutation();
     const [sendMail] = useSendMailMutation();
     const [confirmUser] = useConfirmUserMutation();
+    const [authenticateUser] = useAuthenticateUserMutation(); 
     const navigate = useNavigate();
     const dispatch = useDispatch();
-
+    const [cookies, setCookie] = useCookies([]);
    
     /**run on every change in input */
     const handleInputChange = (e) => {
@@ -43,9 +45,17 @@ export default function SignUp () {
         e.preventDefault();
         try {
             const data = await register(formData).unwrap();
-            /**update local storage and session */
-            localStorage.setItem('session', JSON.stringify(data.userInfo));
-            dispatch(createSession({...data.userInfo}));
+            /**save token in cookie */
+            setCookie('token', data.token, {
+                secure: process.env.REACT_APP_ENV === "production",
+                sameSite: "strict",
+                expires: cookieExpiry
+            })
+            /**get session saved in cookies and update state */
+            const data2 = await authenticateUser().unwrap();
+            if(data2){
+                dispatch(createSession({...data2.sessionInfo}));
+            }
             /**save user details in local storage */
             setTime(timeLeft);
             /**clear form */
@@ -85,8 +95,17 @@ export default function SignUp () {
             /**verify otp and confirm user */
             const data = await verifyOtp({userEmail, otp}).unwrap();
             const verify = await confirmUser({userEmail}).unwrap();
-            localStorage.setItem('session', JSON.stringify(verify.userInfo));
-            dispatch(createSession({...verify.userInfo}));
+            /**update cookies with theuser's new info */
+            setCookie('token', verify.token, {
+                secure: process.env.REACT_APP_ENV === "production",
+                sameSite: "strict",
+                expires: cookieExpiry
+            })
+            /**get session saved in cookies and update state */
+            const data2 = await authenticateUser().unwrap();
+            if(data2){
+                dispatch(createSession({...data2.sessionInfo}));
+            }
             /**update user info/data */
             dispatch(setLoading(false));
             dispatch(setShowOTPForm(false));

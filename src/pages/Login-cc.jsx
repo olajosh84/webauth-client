@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { useLoginMutation } from "../features/apis/authApiSlice";
+import { useLoginMutation, useAuthenticateUserMutation } from "../features/apis/authApiSlice";
 import { createSession } from "../features/users/userDataSlice";
 import { setShowOTPForm } from "../features/auth/otpSlice";
 import { showMailAlert } from "../features/alerts/mailAlertSlice";
@@ -9,25 +9,33 @@ import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Loader } from "../components";
 import handleSHowHidePassword from "../assets/js/showHidePassword";
-
+import { useCookies } from "react-cookie";
 
 const Login = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const { session } = useSelector((store) => store.userData);
+    const { session, cookieExpiry } = useSelector((store) => store.userData);
     const [login, {isLoading}] = useLoginMutation();
+    const [authenticateUser] = useAuthenticateUserMutation();
     const navigate = useNavigate();
     const dispatch = useDispatch();
- 
+    const [cookies, setCookie] = useCookies();
     
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
             const data = await login({username, password}).unwrap();
-            /**update local storage */
-            localStorage.setItem('session', JSON.stringify(data.userInfo));
-            dispatch(createSession({...data.userInfo}));
-            
+            /**update cookies */
+            setCookie('token', data.token, {
+                secure: process.env.REACT_APP_ENV === "production",
+                sameSite: "strict",
+                expires: cookieExpiry
+            })
+            const data2 = await authenticateUser().unwrap();
+            /**save user info in cookies */
+            if(data2){
+                dispatch(createSession({...data2.sessionInfo}));
+            }
             /**clear form */
             setUsername("");
             setPassword("");
@@ -37,8 +45,18 @@ const Login = () => {
             navigate("/account");
         } catch (error) {
             if(error?.data?.message === "You have yet to confirm your email"){
-                localStorage.setItem('session', JSON.stringify(error?.data?.userInfo));
-                dispatch(createSession({...error?.data?.userInfo}));
+                setCookie('token', error?.data?.token, {
+                    secure: process.env.REACT_APP_ENV === "production",
+                    sameSite: "strict",
+                    expires: cookieExpiry
+                })
+                /**before navigating to sign up page, first update local storage/session 
+                 * with new user info and then ensure the otp form is open */
+                /**get session saved in cookies and update state */
+                const data = await authenticateUser().unwrap();
+                if(data){
+                    dispatch(createSession({...data.sessionInfo}));
+                }
                 dispatch(setShowOTPForm(true));
                 dispatch(showMailAlert());
                 navigate("/signup");

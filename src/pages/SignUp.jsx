@@ -47,7 +47,7 @@ export default function SignUp () {
             const data = await register(formData).unwrap();
             /**save token in cookie */
             setCookie('token', data.token, {
-                secure: process.env.REACT_APP_ENV === "production",
+                //secure: process.env.REACT_APP_ENV === "production",
                 //sameSite: "strict",
                 expires: cookieExpiry
             })
@@ -97,9 +97,10 @@ export default function SignUp () {
             const verify = await confirmUser({userEmail}).unwrap();
             /**update cookies with theuser's new info */
             setCookie('token', verify.token, {
-                secure: process.env.REACT_APP_ENV === "production",
+                //secure: process.env.REACT_APP_ENV === "production",
                 //sameSite: "strict",
                 expires: cookieExpiry
+                
             })
             /**get session saved in cookies and update state */
             const data2 = await authenticateUser().unwrap();

@@ -15,7 +15,7 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <BrowserRouter>
     <Provider store={store}>
-      <CookiesProvider defaultSetOptions={{path: '/'}}>
+      <CookiesProvider>
         <App />
       </CookiesProvider>
     </Provider>

@@ -28,7 +28,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
         authenticateUser: builder.mutation({
             query: () => ({
                 url: "/auth/authenticateUser",
-                //method: "GET",
+                method: "GET",
                 credentials: 'include',
             })
         }),
